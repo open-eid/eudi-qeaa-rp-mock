@@ -3,12 +3,16 @@ package ee.ria.eudi.qeaa.rp.service;
 import com.nimbusds.jwt.SignedJWT;
 import ee.ria.eudi.qeaa.rp.configuration.properties.RpProperties;
 import ee.ria.eudi.qeaa.rp.model.RequestObjectResponse;
+import ee.ria.eudi.qeaa.rp.model.ResponseObjectResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.web.client.RestClientSsl;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -34,5 +38,17 @@ public class RpBackendService {
             .accept(APPLICATION_JSON)
             .retrieve()
             .body(RequestObjectResponse.class);
+    }
+
+    public ResponseObjectResponse getResponseObject(String transactionId, String responseCode) {
+        URI requestUri = UriComponentsBuilder.fromUriString(relyingPartyBackend.responseEndpointUrl())
+            .queryParam("transaction_id", transactionId)
+            .queryParam("response_code", responseCode)
+            .build().toUri();
+        return restClient.get()
+            .uri(requestUri)
+            .accept(APPLICATION_JSON)
+            .retrieve()
+            .body(ResponseObjectResponse.class);
     }
 }

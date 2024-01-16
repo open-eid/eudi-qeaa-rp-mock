@@ -67,6 +67,11 @@
         </dependency>
 
         <dependency>
+            <groupId>com.authlete</groupId>
+            <artifactId>cbor</artifactId>
+            <version>1.14</version>
+        </dependency>
+        <dependency>
             <groupId>id.walt</groupId>
             <artifactId>waltid-mdoc-jvm</artifactId>
             <version>1.2312081100.0</version>
@@ -75,6 +80,11 @@
             <groupId>com.upokecenter</groupId>
             <artifactId>cbor</artifactId>
             <version>4.5.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.augustcellars.cose</groupId>
+            <artifactId>cose-java</artifactId>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>nz.net.ultraq.thymeleaf</groupId>
@@ -105,6 +115,11 @@
             <groupId>org.webjars</groupId>
             <artifactId>bootstrap</artifactId>
             <version>5.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>highlightjs</artifactId>
+            <version>11.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.webjars</groupId>

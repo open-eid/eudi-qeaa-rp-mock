@@ -8,7 +8,7 @@
     <div class="alert alert-danger" role="alert">
         <p><strong>HTTP <span th:remove="tag" th:text="${status}"></span></strong></p>
         <p th:utext="${error}"></p>
-        <p th:if="${message != null}" th:utext="${message}"></p>
+        <p th:if="${error_description != null}" th:utext="${error_description}"></p>
     </div>
 </div>
 </body>

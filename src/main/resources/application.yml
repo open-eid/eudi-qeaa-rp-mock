@@ -21,9 +21,6 @@ spring:
             private-key: classpath:eudi-rp.localhost.key
           truststore:
             certificate: classpath:eudi-ca.localhost.crt
-        eudi-issuer:
-          truststore:
-            certificate: classpath:eudi-issuer.localhost.crt
         eudi-issuer-ca:
           truststore:
             certificate: classpath:eudi-ca.localhost.crt
