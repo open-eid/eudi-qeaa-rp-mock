@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org">
+<body>
+<div layout:fragment="content">
+    <h2 class="text-body-emphasis">(Q)EAA Presentation Flow</h2>
+    <p class="fs-5 col-md-8">This view demonstrates the (Q)EAA Presentation Flow.
+    </p>
+    <p>Flow details are described in <a
+            href="https://github.com/open-eid/eudi-qeaa-doc/blob/master/eudi-qeaa-issuer.md#presentation-flow">here</a>.
+    </p>
+    <h3 class="text-body-emphasis">Presentation Request Object</h3>
+    <form action="#" id="request-object-form" method="get" th:action="@{/}">
+        <div class="form-row">
+            <div class="col-xl-6 col-lg-8 col-md-7 col-sm-12 mb-4">
+                <select class="form-select" id="doc-type-select" name="doc_type">
+                    <option selected value="">Generate request object for different credential</option>
+                    <option th:each="docType : ${doc_types}" th:text="${docType.getUri()}"
+                            th:value="${docType}"></option>
+                </select>
+            </div>
+        </div>
+    </form>
+    <form action="#" id="request-credential-form" method="post" th:action="@{/request-credential-presentation}">
+        <p>Modify the Request Object to test the presentation flow:</p>
+        <div id="json-editor" style="width: 100%;" th:object="${json}"></div>
+        <input id="request_object" name="request_object" type="hidden">
+        <div class="alert alert-danger" id="json-alert" role="alert" style="display: none;">
+            Invalid JSON!
+        </div>
+        <button class="btn btn-primary btn-primary px-4 mt-3" type="submit">Request presentation of Mobile Driving
+            Licence
+        </button>
+    </form>
+</div>
+<div layout:fragment="scripts">
+    <script th:inline="javascript">
+        let editor = ace.edit("json-editor");
+        editor.setTheme("ace/theme/dracula");
+        editor.getSession().setMode("ace/mode/json");
+        editor.setShowPrintMargin(false);
+        editor.setFontSize(14);
+        editor.setValue([[${request_object}]]);
+        editor.gotoLine(0, 0, true);
+        editor.setOptions({
+            maxLines: Infinity
+        });
+        document.getElementById('doc-type-select').addEventListener('change', function () {
+            document.getElementById('request-object-form').submit();
+        });
+        document.getElementById('request-credential-form').addEventListener('submit', function (e) {
+            let annotations = editor.getSession().getAnnotations();
+            let hasErrors = annotations.some(function (annotation) {
+                return annotation.type === "error";
+            });
+            let jsonAlert = document.getElementById('json-alert');
+            if (hasErrors) {
+                e.preventDefault();
+                jsonAlert.style.display = '';
+            } else {
+                jsonAlert.style.display = 'none';
+                document.getElementById('request_object').value = editor.getValue();
+            }
+        });
+    </script>
+</div>
+</body>
+</html>

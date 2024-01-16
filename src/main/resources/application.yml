@@ -44,3 +44,13 @@ management:
       enabled: true
     os:
       enabled: true
+
+eudi:
+  rp:
+    base-url: https://eudi-rp.localhost:14443
+  rp-backend:
+    base-url: https://eudi-rp-backend.localhost:15443
+    request-endpoint-url: https://eudi-rp-backend.localhost:15443/request
+    response-endpoint-url: https://eudi-rp-backend.localhost:15443/response
+  wallet:
+    authorization-url: https://eudi-wallet.localhost:16443/authorize
