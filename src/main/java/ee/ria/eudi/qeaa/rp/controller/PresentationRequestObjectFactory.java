@@ -6,6 +6,7 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
 import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.id.State;
@@ -14,6 +15,7 @@ import ee.ria.eudi.qeaa.rp.configuration.properties.RpProperties;
 import ee.ria.eudi.qeaa.rp.controller.PresentationDefinition.Constraints;
 import ee.ria.eudi.qeaa.rp.controller.PresentationDefinition.Field;
 import ee.ria.eudi.qeaa.rp.controller.PresentationDefinition.InputDescriptor;
+import ee.ria.eudi.qeaa.rp.controller.VerifierMetadata.MsoMdoc;
 import ee.ria.eudi.qeaa.rp.controller.VerifierMetadata.VpFormats;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -25,7 +27,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static ee.ria.eudi.qeaa.rp.controller.PresentationRequestObject.ClientIdScheme.X509_SAN_DNS;
-import static ee.ria.eudi.qeaa.rp.controller.PresentationRequestObject.ResponseMode.DIRECT_POST;
+import static ee.ria.eudi.qeaa.rp.controller.PresentationRequestObject.ResponseMode.DIRECT_POST_JWT;
 import static ee.ria.eudi.qeaa.rp.controller.PresentationRequestObject.ResponseType.VP_TOKEN;
 
 @Component
@@ -37,14 +39,14 @@ public class PresentationRequestObjectFactory {
     private final ECKey rpKey;
     private final JWSAlgorithm rpKeyJwsAlg;
 
-    public PresentationRequestObject create(CredentialDoctype doctype, List<CredentialAttribute> attributes) {
+    public PresentationRequestObject create(CredentialDoctype doctype, List<CredentialAttribute> attributes, ECKey responseEncryptionKey) {
         return PresentationRequestObject.builder()
             .clientId(rpProperties.rp().clientId())
             .clientIdScheme(X509_SAN_DNS)
             .responseType(VP_TOKEN)
-            .responseMode(DIRECT_POST)
+            .responseMode(DIRECT_POST_JWT)
             .responseUri(rpProperties.rpBackend().responseEndpointUrl())
-            .clientMetadata(getClientMetadata())
+            .clientMetadata(getClientMetadata(responseEncryptionKey))
             .presentationDefinition(getPresentationDefinition(doctype, attributes))
             .nonce(new Nonce().getValue())
             .state(new State().getValue())
@@ -62,9 +64,9 @@ public class PresentationRequestObjectFactory {
         return requestObjectJwt;
     }
 
-    private VerifierMetadata getClientMetadata() {
-        VerifierMetadata.MsoMdoc msoMdoc = VerifierMetadata.MsoMdoc.builder()
-            .alg(List.of("ES256", "ES384", "ES512"))
+    private VerifierMetadata getClientMetadata(ECKey responseEncryptionKey) {
+        MsoMdoc msoMdoc = MsoMdoc.builder()
+            .alg(List.of("ES256", "ES384", "ES512", "EdDSA")) // ISO-23220-4
             .build();
         VpFormats vpFormats = VpFormats.builder()
             .msoMdoc(msoMdoc)
@@ -74,6 +76,9 @@ public class PresentationRequestObjectFactory {
             .clientUri(rpProperties.rp().baseUrl() + "/info")
             .logoUri(rpProperties.rp().baseUrl() + "/rp_logo.png")
             .vpFormats(vpFormats)
+            .authorizationEncryptedResponseAlg("ECDH-ES")
+            .authorizationEncryptedResponseEnc("A128CBC-HS256")
+            .jwks(new JWKSet(responseEncryptionKey.toPublicJWK()).toJSONObject())
             .build();
     }
 
@@ -91,7 +96,7 @@ public class PresentationRequestObjectFactory {
             .build();
         InputDescriptor inputDescriptor = InputDescriptor.builder()
             .id(UUID.randomUUID().toString())
-            .format(Map.of("mso_mdoc", Map.of("alg", List.of("ES256", "ES384", "ES512"))))
+            .format(Map.of("mso_mdoc", Map.of("alg", List.of("ES256", "ES384", "ES512", "EdDSA", "ESB256", "ESB320", "ESB384", "ESB512")))) // ISO-23220-4
             .constraints(constraints)
             .build();
         return PresentationDefinition.builder()

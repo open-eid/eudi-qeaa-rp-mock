@@ -9,6 +9,7 @@ import ee.ria.eudi.qeaa.rp.error.ServiceException;
 import id.walt.mdoc.COSECryptoProviderKeyInfo;
 import id.walt.mdoc.SimpleCOSECryptoProvider;
 import id.walt.mdoc.cose.COSESign1;
+import id.walt.mdoc.dataelement.ByteStringElement;
 import id.walt.mdoc.dataelement.DataElement;
 import id.walt.mdoc.dataelement.EncodedCBORElement;
 import id.walt.mdoc.dataelement.ListElement;
@@ -20,10 +21,12 @@ import id.walt.mdoc.issuersigned.IssuerSigned;
 import id.walt.mdoc.mdocauth.DeviceAuthentication;
 import id.walt.mdoc.mso.DeviceKeyInfo;
 import id.walt.mdoc.mso.MSO;
+import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.ByteArrayInputStream;
+import java.security.MessageDigest;
 import java.security.PublicKey;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -63,29 +66,32 @@ public class MDocUtil {
             .collect(Collectors.toMap(
                 CredentialNamespace::fromUri,
                 namespace -> mDoc.getIssuerSignedItems(namespace).stream()
+                    .filter(item -> item.getElementValue().getInternalValue() != null)
                     .collect(Collectors.toMap(
                         item -> item.getElementIdentifier().getValue(),
-                        item -> item.getElementValue().getValue()
+                        item -> item.getElementValue().getInternalValue()
                     ))
             ));
     }
 
-    public DeviceAuthentication getDeviceAuthentication(String clientId, String nonce, String doctype) {
+    public DeviceAuthentication getDeviceAuthentication(String clientId, String doctype, String responseUri, String nonce, String mdocNonce) {
         ListElement sessionTranscript = new ListElement(
-            List.<DataElement<?>>of(
+            List.of(
                 new NullElement(),
                 new NullElement(),
-                new ListElement(
-                    List.of(
-                        new StringElement("openID4VPHandover"),
-                        new StringElement(clientId),
-                        new StringElement(nonce))
-                )
-
-            )
-        );
+                getOID4VPHandover(clientId, responseUri, nonce, mdocNonce)));
         EncodedCBORElement deviceNameSpaces = new EncodedCBORElement(new MapElement(Map.of()));
         return new DeviceAuthentication(sessionTranscript, doctype, deviceNameSpaces);
+    }
+
+    @SneakyThrows
+    private ListElement getOID4VPHandover(String clientId, String responseUri, String nonce, String mdocNonce) {
+        log.info("OID4VPHandover - client_id: {}, response_uri: {}, nonce: {}, mdoc_nonce: {}", clientId, responseUri, nonce, mdocNonce);
+        byte[] clientIdToHash = new ListElement(List.of(new StringElement(clientId), new StringElement(mdocNonce))).toCBOR();
+        byte[] responseUriToHash = new ListElement(List.of(new StringElement(responseUri), new StringElement(mdocNonce))).toCBOR();
+        byte[] clientIdHash = MessageDigest.getInstance("SHA-256").digest(clientIdToHash);
+        byte[] responseUriHash = MessageDigest.getInstance("SHA-256").digest(responseUriToHash);
+        return new ListElement(List.of(new ByteStringElement(clientIdHash), new ByteStringElement(responseUriHash), new StringElement(nonce)));
     }
 
     public AlgorithmID getAlgorithmId(PublicKey publicKey) {

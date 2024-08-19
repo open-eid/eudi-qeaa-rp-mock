@@ -22,6 +22,8 @@ public record PresentationSubmission(
         String format,
         String path,
         PathNested pathNested) {
+        public static final String CREDENTIAL_FORMAT_MSO_MDOC = "mso_mdoc";
+        public static final String CREDENTIAL_PATH_AS_DIRECT_VP_TOKEN_VALUE = "$";
 
     }
 

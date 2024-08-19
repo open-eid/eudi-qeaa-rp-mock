@@ -25,6 +25,8 @@
         <p>Modify the Request Object to test the presentation flow:</p>
         <div id="json-editor" style="width: 100%;" th:object="${json}"></div>
         <input id="request_object" name="request_object" type="hidden">
+        <input id="response_encryption_key" name="response_encryption_key" type="hidden"
+               th:value="${response_encryption_key}">
         <div class="alert alert-danger" id="json-alert" role="alert" style="display: none;">
             Invalid JSON!
         </div>

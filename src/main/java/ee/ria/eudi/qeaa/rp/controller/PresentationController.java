@@ -5,6 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWEAlgorithm;
+import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.KeyUse;
+import com.nimbusds.jose.jwk.gen.ECKeyGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import ee.ria.eudi.qeaa.rp.model.Transaction;
@@ -32,6 +37,7 @@ import java.text.ParseException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import static ee.ria.eudi.qeaa.rp.controller.CredentialDoctype.ORG_ISO_18013_5_1_MDL;
 
@@ -48,22 +54,27 @@ public class PresentationController {
     private String walletAuthorizationUrl;
 
     @GetMapping("/")
-    public ModelAndView preparePresentationView(@RequestParam(name = "doc_type", required = false) String docType) throws JsonProcessingException {
+    public ModelAndView preparePresentationView(@RequestParam(name = "doc_type", required = false) String docType) throws JsonProcessingException, JOSEException {
         CredentialDoctype credentialDoctype = CredentialDoctype.valueOf(StringUtils.defaultIfBlank(docType, ORG_ISO_18013_5_1_MDL.name()));
         List<CredentialAttribute> attributes = CredentialAttribute.getAttributes(credentialDoctype);
-        PresentationRequestObject requestObject = presentationRequestObjectFactory.create(credentialDoctype, attributes);
-        String requestObjectForTesting = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestObject);
+        ECKey responseEncryptionKey = new ECKeyGenerator(Curve.P_256)
+            .keyUse(KeyUse.ENCRYPTION)
+            .algorithm(JWEAlgorithm.ECDH_ES)
+            .keyID(UUID.randomUUID().toString())
+            .generate();
+        PresentationRequestObject requestObject = presentationRequestObjectFactory.create(credentialDoctype, attributes, responseEncryptionKey);
         ModelAndView modelAndView = new ModelAndView("prepare-presentation");
         modelAndView.addObject("doc_types", CredentialDoctype.values());
-        modelAndView.addObject("request_object", requestObjectForTesting);
+        modelAndView.addObject("request_object", objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(requestObject));
+        modelAndView.addObject("response_encryption_key", responseEncryptionKey.toJSONObject());
         return modelAndView;
     }
 
     @PostMapping("/presentation")
-    public ModelAndView presentationView(@ModelAttribute("request_object") String requestObject) throws JOSEException, ParseException, IOException, WriterException {
+    public ModelAndView presentationView(@ModelAttribute("request_object") String requestObject, @ModelAttribute("response_encryption_key") String responseEncryptionKey) throws JOSEException, ParseException, IOException, WriterException {
         SignedJWT presentationRequest = presentationRequestObjectFactory.create(requestObject);
         RequestObjectResponse response = rpBackendService.postRequestObject(presentationRequest);
-        startTransaction(presentationRequest, response);
+        startTransaction(presentationRequest, response, ECKey.parse(responseEncryptionKey));
 
         String redirectUrl = UriComponentsBuilder
             .fromUriString(walletAuthorizationUrl)
@@ -84,10 +95,10 @@ public class PresentationController {
     }
 
     @PostMapping(value = REQUEST_CREDENTIAL_PRESENTATION_REQUEST_MAPPING)
-    public RedirectView requestPresentation(@ModelAttribute("request_object") String requestObject) throws JOSEException, ParseException {
+    public RedirectView requestPresentation(@ModelAttribute("request_object") String requestObject, @ModelAttribute("response_encryption_key") String responseEncryptionKey) throws JOSEException, ParseException {
         SignedJWT presentationRequest = presentationRequestObjectFactory.create(requestObject);
         RequestObjectResponse response = rpBackendService.postRequestObject(presentationRequest);
-        startTransaction(presentationRequest, response);
+        startTransaction(presentationRequest, response, ECKey.parse(responseEncryptionKey));
         return new RedirectView(UriComponentsBuilder
             .fromUriString(walletAuthorizationUrl)
             .queryParam("request_uri", response.requestUri())
@@ -95,15 +106,16 @@ public class PresentationController {
             .toUriString());
     }
 
-    private void startTransaction(SignedJWT signedRequestObject, RequestObjectResponse requestObjectResponse) throws ParseException {
+    private void startTransaction(SignedJWT signedRequestObject, RequestObjectResponse requestObjectResponse, ECKey responseEncryptionKey) throws ParseException {
         JWTClaimsSet roClaims = signedRequestObject.getJWTClaimsSet();
         Map<String, Object> presentationDefinition = roClaims.getJSONObjectClaim("presentation_definition");
         transactionRepository.save(Transaction.builder()
             .nonce(roClaims.getStringClaim("nonce"))
             .state(roClaims.getStringClaim("state"))
-            .presentationId(presentationDefinition != null ? (String) presentationDefinition.get("id") : null)
+            .presentationDefinition(presentationDefinition)
             .transactionId(requestObjectResponse.transactionId())
             .responseCode(requestObjectResponse.responseCode())
+            .responseEncryptionKey(responseEncryptionKey)
             .build());
     }
 }
