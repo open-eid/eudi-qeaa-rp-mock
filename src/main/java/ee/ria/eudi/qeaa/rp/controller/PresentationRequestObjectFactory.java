@@ -1,4 +1,4 @@
-package ee.ria.eudi.qeaa.rp.factory;
+package ee.ria.eudi.qeaa.rp.controller;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JOSEObjectType;
@@ -11,15 +11,10 @@ import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.id.State;
 import com.nimbusds.openid.connect.sdk.Nonce;
 import ee.ria.eudi.qeaa.rp.configuration.properties.RpProperties;
-import ee.ria.eudi.qeaa.rp.model.CredentialAttribute;
-import ee.ria.eudi.qeaa.rp.model.CredentialDoctype;
-import ee.ria.eudi.qeaa.rp.model.PresentationDefinition;
-import ee.ria.eudi.qeaa.rp.model.PresentationDefinition.Constraints;
-import ee.ria.eudi.qeaa.rp.model.PresentationDefinition.Field;
-import ee.ria.eudi.qeaa.rp.model.PresentationDefinition.InputDescriptor;
-import ee.ria.eudi.qeaa.rp.model.PresentationRequestObject;
-import ee.ria.eudi.qeaa.rp.model.VerifierMetadata;
-import ee.ria.eudi.qeaa.rp.model.VerifierMetadata.VpFormats;
+import ee.ria.eudi.qeaa.rp.controller.PresentationDefinition.Constraints;
+import ee.ria.eudi.qeaa.rp.controller.PresentationDefinition.Field;
+import ee.ria.eudi.qeaa.rp.controller.PresentationDefinition.InputDescriptor;
+import ee.ria.eudi.qeaa.rp.controller.VerifierMetadata.VpFormats;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -29,9 +24,9 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static ee.ria.eudi.qeaa.rp.model.PresentationRequestObject.ClientIdScheme.X509_SAN_DNS;
-import static ee.ria.eudi.qeaa.rp.model.PresentationRequestObject.ResponseMode.DIRECT_POST;
-import static ee.ria.eudi.qeaa.rp.model.PresentationRequestObject.ResponseType.VP_TOKEN;
+import static ee.ria.eudi.qeaa.rp.controller.PresentationRequestObject.ClientIdScheme.X509_SAN_DNS;
+import static ee.ria.eudi.qeaa.rp.controller.PresentationRequestObject.ResponseMode.DIRECT_POST;
+import static ee.ria.eudi.qeaa.rp.controller.PresentationRequestObject.ResponseType.VP_TOKEN;
 
 @Component
 @RequiredArgsConstructor

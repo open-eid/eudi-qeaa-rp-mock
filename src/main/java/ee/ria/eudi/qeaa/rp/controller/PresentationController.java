@@ -5,13 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import ee.ria.eudi.qeaa.rp.factory.PresentationRequestObjectFactory;
-import ee.ria.eudi.qeaa.rp.model.CredentialAttribute;
-import ee.ria.eudi.qeaa.rp.model.CredentialDoctype;
-import ee.ria.eudi.qeaa.rp.model.PresentationRequestObject;
-import ee.ria.eudi.qeaa.rp.model.RequestObjectResponse;
 import ee.ria.eudi.qeaa.rp.model.Transaction;
 import ee.ria.eudi.qeaa.rp.repository.TransactionRepository;
+import ee.ria.eudi.qeaa.rp.service.RequestObjectResponse;
 import ee.ria.eudi.qeaa.rp.service.RpBackendService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +25,7 @@ import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
-import static ee.ria.eudi.qeaa.rp.model.CredentialDoctype.ORG_ISO_18013_5_1_MDL;
+import static ee.ria.eudi.qeaa.rp.controller.CredentialDoctype.ORG_ISO_18013_5_1_MDL;
 
 @Controller
 @RequiredArgsConstructor

@@ -1,9 +1,9 @@
 package ee.ria.eudi.qeaa.rp.validation;
 
+import ee.ria.eudi.qeaa.rp.controller.CredentialNamespace;
 import ee.ria.eudi.qeaa.rp.error.ServiceException;
-import ee.ria.eudi.qeaa.rp.model.CredentialNamespace;
-import ee.ria.eudi.qeaa.rp.model.PresentationSubmission;
-import ee.ria.eudi.qeaa.rp.model.PresentationSubmission.InputDescriptor;
+import ee.ria.eudi.qeaa.rp.service.PresentationSubmission;
+import ee.ria.eudi.qeaa.rp.service.PresentationSubmission.InputDescriptor;
 import ee.ria.eudi.qeaa.rp.util.MDocUtil;
 import id.walt.mdoc.SimpleCOSECryptoProvider;
 import id.walt.mdoc.doc.MDoc;

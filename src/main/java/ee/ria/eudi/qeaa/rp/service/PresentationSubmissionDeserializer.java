@@ -1,4 +1,4 @@
-package ee.ria.eudi.qeaa.rp.model;
+package ee.ria.eudi.qeaa.rp.service;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

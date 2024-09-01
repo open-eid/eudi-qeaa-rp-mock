@@ -2,8 +2,6 @@ package ee.ria.eudi.qeaa.rp.service;
 
 import com.nimbusds.jwt.SignedJWT;
 import ee.ria.eudi.qeaa.rp.configuration.properties.RpProperties;
-import ee.ria.eudi.qeaa.rp.model.RequestObjectResponse;
-import ee.ria.eudi.qeaa.rp.model.ResponseObjectResponse;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.web.client.RestClientSsl;

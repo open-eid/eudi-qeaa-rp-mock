@@ -1,4 +1,4 @@
-package ee.ria.eudi.qeaa.rp.model;
+package ee.ria.eudi.qeaa.rp.controller;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -2,10 +2,9 @@ package ee.ria.eudi.qeaa.rp.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.ria.eudi.qeaa.rp.error.ServiceException;
-import ee.ria.eudi.qeaa.rp.model.CredentialNamespace;
-import ee.ria.eudi.qeaa.rp.model.ResponseObjectResponse;
 import ee.ria.eudi.qeaa.rp.model.Transaction;
 import ee.ria.eudi.qeaa.rp.repository.TransactionRepository;
+import ee.ria.eudi.qeaa.rp.service.ResponseObjectResponse;
 import ee.ria.eudi.qeaa.rp.service.RpBackendService;
 import ee.ria.eudi.qeaa.rp.validation.VpTokenValidator;
 import lombok.RequiredArgsConstructor;
@@ -19,8 +18,8 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.Map;
 
-import static ee.ria.eudi.qeaa.rp.model.CredentialAttribute.ORG_ISO_18013_5_1_PORTRAIT;
-import static ee.ria.eudi.qeaa.rp.model.CredentialNamespace.ORG_ISO_18013_5_1;
+import static ee.ria.eudi.qeaa.rp.controller.CredentialAttribute.ORG_ISO_18013_5_1_PORTRAIT;
+import static ee.ria.eudi.qeaa.rp.controller.CredentialNamespace.ORG_ISO_18013_5_1;
 
 @Controller
 @RequiredArgsConstructor
