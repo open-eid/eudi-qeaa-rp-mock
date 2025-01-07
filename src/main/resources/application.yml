@@ -44,6 +44,7 @@ management:
 
 eudi:
   rp:
+    client-id: eudi-rp.localhost
     base-url: https://eudi-rp.localhost:14443
   rp-backend:
     base-url: https://eudi-rp-backend.localhost:15443

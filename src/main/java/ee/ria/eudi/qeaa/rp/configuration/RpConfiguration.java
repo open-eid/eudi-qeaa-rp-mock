@@ -5,7 +5,6 @@ import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.crypto.ECDSASigner;
 import com.nimbusds.jose.jwk.ECKey;
 import ee.ria.eudi.qeaa.rp.util.JwtUtil;
-import ee.ria.eudi.qeaa.rp.util.X509CertUtil;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.ssl.SslBundle;
 import org.springframework.boot.ssl.SslBundles;
@@ -19,11 +18,6 @@ import java.security.cert.X509Certificate;
 @Configuration
 @ConfigurationPropertiesScan
 public class RpConfiguration {
-
-    @Bean
-    public String rpClientId(X509Certificate rpCert) {
-        return X509CertUtil.getSubjectAlternativeNameDNSName(rpCert);
-    }
 
     @Bean
     public X509Certificate rpCert(SslBundles sslBundles) throws KeyStoreException {

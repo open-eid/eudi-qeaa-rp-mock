@@ -17,6 +17,8 @@ public record RpProperties(
     @ConfigurationProperties(prefix = "eudi.rp")
     public record RelyingParty(
         @NotBlank
+        String clientId,
+        @NotBlank
         @Pattern(regexp = ".*(?<!/)$")
         String baseUrl) {
     }

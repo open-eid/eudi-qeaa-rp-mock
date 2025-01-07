@@ -32,7 +32,6 @@ import static ee.ria.eudi.qeaa.rp.controller.PresentationRequestObject.ResponseT
 @RequiredArgsConstructor
 public class PresentationRequestObjectFactory {
     public static final JOSEObjectType OAUTH_AUTHZ_REQ_JWT = new JOSEObjectType("oauth-authz-req+jwt");
-    private final String rpClientId;
     private final RpProperties rpProperties;
     private final ECDSASigner rpKeySigner;
     private final ECKey rpKey;
@@ -40,7 +39,7 @@ public class PresentationRequestObjectFactory {
 
     public PresentationRequestObject create(CredentialDoctype doctype, List<CredentialAttribute> attributes) {
         return PresentationRequestObject.builder()
-            .clientId(rpClientId)
+            .clientId(rpProperties.rp().clientId())
             .clientIdScheme(X509_SAN_DNS)
             .responseType(VP_TOKEN)
             .responseMode(DIRECT_POST)
