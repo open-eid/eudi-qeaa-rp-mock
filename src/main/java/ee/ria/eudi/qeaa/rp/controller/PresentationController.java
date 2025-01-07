@@ -39,7 +39,6 @@ import static ee.ria.eudi.qeaa.rp.controller.CredentialDoctype.ORG_ISO_18013_5_1
 @RequiredArgsConstructor
 public class PresentationController {
     public static final String REQUEST_CREDENTIAL_PRESENTATION_REQUEST_MAPPING = "request-presentation";
-    private final String rpClientId;
     private final RpBackendService rpBackendService;
     private final TransactionRepository transactionRepository;
     private final PresentationRequestObjectFactory presentationRequestObjectFactory;
@@ -69,7 +68,7 @@ public class PresentationController {
         String redirectUrl = UriComponentsBuilder
             .fromUriString(walletAuthorizationUrl)
             .queryParam("request_uri", response.requestUri())
-            .queryParam("client_id", rpClientId)
+            .queryParam("client_id", presentationRequest.getJWTClaimsSet().getStringClaim("client_id"))
             .toUriString();
 
         QRCodeWriter writer = new QRCodeWriter();
@@ -92,7 +91,7 @@ public class PresentationController {
         return new RedirectView(UriComponentsBuilder
             .fromUriString(walletAuthorizationUrl)
             .queryParam("request_uri", response.requestUri())
-            .queryParam("client_id", rpClientId)
+            .queryParam("client_id", presentationRequest.getJWTClaimsSet().getStringClaim("client_id"))
             .toUriString());
     }
 
