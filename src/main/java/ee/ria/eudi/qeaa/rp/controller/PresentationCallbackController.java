@@ -1,6 +1,5 @@
 package ee.ria.eudi.qeaa.rp.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEHeader;
@@ -15,13 +14,13 @@ import ee.ria.eudi.qeaa.rp.service.ResponseObjectResponse;
 import ee.ria.eudi.qeaa.rp.service.RpBackendService;
 import ee.ria.eudi.qeaa.rp.validation.VpTokenValidator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.Base64;
 import java.util.Collections;
@@ -33,6 +32,7 @@ import static ee.ria.eudi.qeaa.rp.controller.CredentialNamespace.ORG_ISO_18013_5
 import static ee.ria.eudi.qeaa.rp.service.PresentationSubmission.InputDescriptor.CREDENTIAL_FORMAT_MSO_MDOC;
 import static ee.ria.eudi.qeaa.rp.service.PresentationSubmission.InputDescriptor.CREDENTIAL_PATH_AS_DIRECT_VP_TOKEN_VALUE;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class PresentationCallbackController {
@@ -44,9 +44,12 @@ public class PresentationCallbackController {
     private final VpTokenValidator vpTokenValidator;
 
     @GetMapping(PRESENTATION_CALLBACK_REQUEST_MAPPING)
-    public ModelAndView presentationRequestCallback(@RequestParam(name = "response_code") String responseCode) throws IOException, ParseException, JOSEException {
+    public ModelAndView presentationRequestCallback(@RequestParam(name = "response_code") String responseCode) throws ParseException, JOSEException {
+        log.debug("Received presentation callback with response code: {}", responseCode);
         Transaction transaction = getAndInvalidateTransaction(responseCode);
+        log.debug("Transaction found for response code: {}", transaction.getTransactionId());
         ResponseObjectResponse responseObject = rpBackendService.getResponseObject(transaction.getTransactionId(), responseCode);
+        log.debug("Response object received with state: {}", responseObject.state());
         if (!transaction.getState().equals(responseObject.state())) {
             throw new ServiceException("Invalid state");
         }
@@ -69,6 +72,7 @@ public class PresentationCallbackController {
             mdlClaims.replace("portrait", encodedPortrait);
         }
         modelAndView.addObject("claims", vpTokenClaims);
+        log.debug("Returning credential view");
         return modelAndView;
     }
 
