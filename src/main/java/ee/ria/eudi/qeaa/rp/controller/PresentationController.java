@@ -29,7 +29,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.view.RedirectView;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.ByteArrayOutputStream;
@@ -46,7 +45,6 @@ import static ee.ria.eudi.qeaa.rp.controller.CredentialDoctype.ORG_ISO_18013_5_1
 @Controller
 @RequiredArgsConstructor
 public class PresentationController {
-    public static final String REQUEST_CREDENTIAL_PRESENTATION_REQUEST_MAPPING = "request-presentation";
     private final RpBackendService rpBackendService;
     private final TransactionRepository transactionRepository;
     private final PresentationRequestObjectFactory presentationRequestObjectFactory;
@@ -96,18 +94,6 @@ public class PresentationController {
         modelAndView.addObject("redirectUrl", redirectUrl);
         log.debug("Returning presentation view with with redirect_url: {}", redirectUrl);
         return modelAndView;
-    }
-
-    @PostMapping(value = REQUEST_CREDENTIAL_PRESENTATION_REQUEST_MAPPING)
-    public RedirectView requestPresentation(@ModelAttribute("request_object") String requestObject, @ModelAttribute("response_encryption_key") String responseEncryptionKey) throws JOSEException, ParseException {
-        SignedJWT presentationRequest = presentationRequestObjectFactory.create(requestObject);
-        RequestObjectResponse response = rpBackendService.postRequestObject(presentationRequest);
-        startTransaction(presentationRequest, response, ECKey.parse(responseEncryptionKey));
-        return new RedirectView(UriComponentsBuilder
-            .fromUriString(walletAuthorizationUrl)
-            .queryParam("request_uri", response.requestUri())
-            .queryParam("client_id", presentationRequest.getJWTClaimsSet().getStringClaim("client_id"))
-            .toUriString());
     }
 
     private void startTransaction(SignedJWT signedRequestObject, RequestObjectResponse requestObjectResponse, ECKey responseEncryptionKey) throws ParseException {
