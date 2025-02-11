@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import static ee.ria.eudi.qeaa.rp.controller.CredentialAttribute.ORG_ISO_18013_5_1_PORTRAIT;
+import static ee.ria.eudi.qeaa.rp.controller.CredentialAttribute.ORG_ISO_18013_5_1_SIGNATURE_USUAL_MARK;
 import static ee.ria.eudi.qeaa.rp.controller.CredentialNamespace.ORG_ISO_18013_5_1;
 import static ee.ria.eudi.qeaa.rp.service.PresentationSubmission.InputDescriptor.CREDENTIAL_FORMAT_MSO_MDOC;
 import static ee.ria.eudi.qeaa.rp.service.PresentationSubmission.InputDescriptor.CREDENTIAL_PATH_AS_DIRECT_VP_TOKEN_VALUE;
@@ -70,6 +71,10 @@ public class PresentationCallbackController {
         if (mdlClaims.containsKey("portrait")) {
             String encodedPortrait = Base64.getEncoder().encodeToString((byte[]) mdlClaims.get(ORG_ISO_18013_5_1_PORTRAIT.getUri()));
             mdlClaims.replace("portrait", encodedPortrait);
+        }
+        if (mdlClaims.containsKey("signature_usual_mark")) {
+            String encodedPortrait = Base64.getEncoder().encodeToString((byte[]) mdlClaims.get(ORG_ISO_18013_5_1_SIGNATURE_USUAL_MARK.getUri()));
+            mdlClaims.replace("signature_usual_mark", encodedPortrait);
         }
         modelAndView.addObject("claims", vpTokenClaims);
         log.debug("Returning credential view");

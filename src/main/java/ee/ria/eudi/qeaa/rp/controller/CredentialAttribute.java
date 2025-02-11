@@ -23,6 +23,7 @@ public enum CredentialAttribute {
     EU_EUROPA_EC_EUDI_PID_1_NATIONALITY(CredentialDoctype.EU_EUROPA_EC_EUDI_PID_1, CredentialNamespace.EU_EUROPA_EC_EUDI_PID_1, "nationality"),
     U_EUROPA_EC_EUDI_PID_1_AGE_OVER_18(CredentialDoctype.EU_EUROPA_EC_EUDI_PID_1, CredentialNamespace.EU_EUROPA_EC_EUDI_PID_1, "age_over_18"),
 
+    ORG_ISO_18013_5_1_ADMINISTRATIVE_NUMBER(CredentialDoctype.ORG_ISO_18013_5_1_MDL, CredentialNamespace.ORG_ISO_18013_5_1, "administrative_number"),
     ORG_ISO_18013_5_1_FAMILY_NAME(CredentialDoctype.ORG_ISO_18013_5_1_MDL, CredentialNamespace.ORG_ISO_18013_5_1, "family_name"),
     ORG_ISO_18013_5_1_GIVEN_NAME(CredentialDoctype.ORG_ISO_18013_5_1_MDL, CredentialNamespace.ORG_ISO_18013_5_1, "given_name"),
     ORG_ISO_18013_5_1_BIRTH_DATE(CredentialDoctype.ORG_ISO_18013_5_1_MDL, CredentialNamespace.ORG_ISO_18013_5_1, "birth_date"),
@@ -33,7 +34,9 @@ public enum CredentialAttribute {
     ORG_ISO_18013_5_1_DOCUMENT_NUMBER(CredentialDoctype.ORG_ISO_18013_5_1_MDL, CredentialNamespace.ORG_ISO_18013_5_1, "document_number"),
     ORG_ISO_18013_5_1_PORTRAIT(CredentialDoctype.ORG_ISO_18013_5_1_MDL, CredentialNamespace.ORG_ISO_18013_5_1, "portrait"),
     ORG_ISO_18013_5_1_DRIVING_PRIVILEGES(CredentialDoctype.ORG_ISO_18013_5_1_MDL, CredentialNamespace.ORG_ISO_18013_5_1, "driving_privileges"),
-    ORG_ISO_18013_5_1_UN_DISTINGUISHING_SIGN(CredentialDoctype.ORG_ISO_18013_5_1_MDL, CredentialNamespace.ORG_ISO_18013_5_1, "un_distinguishing_sign");
+    ORG_ISO_18013_5_1_UN_DISTINGUISHING_SIGN(CredentialDoctype.ORG_ISO_18013_5_1_MDL, CredentialNamespace.ORG_ISO_18013_5_1, "un_distinguishing_sign"),
+    ORG_ISO_18013_5_1_SIGNATURE_USUAL_MARK(CredentialDoctype.ORG_ISO_18013_5_1_MDL, CredentialNamespace.ORG_ISO_18013_5_1, "signature_usual_mark"),
+    ORG_ISO_18013_5_1_AGE_OVER_18(CredentialDoctype.ORG_ISO_18013_5_1_MDL, CredentialNamespace.ORG_ISO_18013_5_1, "age_over_18");
 
     private final CredentialDoctype doctype;
     private final CredentialNamespace namespace;
