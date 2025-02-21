@@ -32,7 +32,7 @@ public class VpTokenValidator {
     private final List<X509Certificate> issuerTrustedRootCAs;
 
     public Map<CredentialNamespace, Map<String, Object>> validateMsoMDoc(String vpToken, String nonce, String mDocNonce) {
-        MDoc mDoc = getMDoc(vpToken);
+        MDoc mDoc = getMDocFromDeviceResponse(vpToken);
         if (!mDoc.verifyDocType()) {
             throw new ServiceException("Invalid mDoc doctype");
         }
@@ -50,20 +50,12 @@ public class VpTokenValidator {
             throw new ServiceException("Invalid mDoc issuer signature");
         }
         DeviceAuthentication deviceAuthentication = MDocUtil.getDeviceAuthentication(rpProperties.clientId(), mDoc.getDocType().getValue(), rpBackendProperties.responseEndpointUrl(), nonce, mDocNonce);
-        log.info("Device authentication for client {} and nonce {} -> cbor hex: {}", rpProperties.clientId(), nonce, deviceAuthentication.toDE().toCBORHex());
+        log.info("Device authentication for client {}, response uri: {}, nonce {}, mdoc nonce {} -> cbor hex: {}", rpProperties.clientId(), rpBackendProperties.responseEndpointUrl(), nonce, mDocNonce, deviceAuthentication.toDE().toCBORHex());
         SimpleCOSECryptoProvider deviceCryptoProvider = MDocUtil.getDeviceCryptoProvider(mDoc);
         if (!mDoc.verifyDeviceSignature(deviceAuthentication, deviceCryptoProvider, KEY_ID_DEVICE)) {
             throw new ServiceException("Invalid mDoc device signature");
         }
         return MDocUtil.getIssuerSignedItems(mDoc);
-    }
-
-    private static MDoc getMDoc(String vpToken) {
-        try {
-            return getMDocFromDeviceResponse(vpToken);
-        } catch (Exception e) {
-            return MDoc.Companion.fromCBORHex(vpToken); // TODO: Remove. Needed to support older version of OpenID4VP.
-        }
     }
 
     private static MDoc getMDocFromDeviceResponse(String vpToken) {
