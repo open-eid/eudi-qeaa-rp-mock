@@ -22,14 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.text.ParseException;
-import java.util.Base64;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static ee.ria.eudi.qeaa.rp.controller.CredentialAttribute.ORG_ISO_18013_5_1_PORTRAIT;
-import static ee.ria.eudi.qeaa.rp.controller.CredentialAttribute.ORG_ISO_18013_5_1_SIGNATURE_USUAL_MARK;
-import static ee.ria.eudi.qeaa.rp.controller.CredentialNamespace.ORG_ISO_18013_5_1;
 import static ee.ria.eudi.qeaa.rp.service.PresentationSubmission.InputDescriptor.CREDENTIAL_FORMAT_MSO_MDOC;
 import static ee.ria.eudi.qeaa.rp.service.PresentationSubmission.InputDescriptor.CREDENTIAL_PATH_AS_DIRECT_VP_TOKEN_VALUE;
 
@@ -67,15 +62,6 @@ public class PresentationCallbackController {
         ModelAndView modelAndView = new ModelAndView("credential");
         modelAndView.addObject("vp_token", vpToken);
         modelAndView.addObject("presentation_submission", presentationSubmission);
-        Map<String, Object> mdlClaims = vpTokenClaims.getOrDefault(ORG_ISO_18013_5_1, Collections.emptyMap());
-        if (mdlClaims.containsKey("portrait")) {
-            String encodedPortrait = Base64.getEncoder().encodeToString((byte[]) mdlClaims.get(ORG_ISO_18013_5_1_PORTRAIT.getUri()));
-            mdlClaims.replace("portrait", encodedPortrait);
-        }
-        if (mdlClaims.containsKey("signature_usual_mark")) {
-            String encodedPortrait = Base64.getEncoder().encodeToString((byte[]) mdlClaims.get(ORG_ISO_18013_5_1_SIGNATURE_USUAL_MARK.getUri()));
-            mdlClaims.replace("signature_usual_mark", encodedPortrait);
-        }
         modelAndView.addObject("claims", vpTokenClaims);
         log.debug("Returning credential view");
         return modelAndView;
