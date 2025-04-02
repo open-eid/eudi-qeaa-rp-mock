@@ -1,8 +1,8 @@
 package ee.ria.eudi.qeaa.rp.util;
 
-import COSE.AlgorithmID;
-import COSE.CoseException;
-import COSE.OneKey;
+import org.cose.java.AlgorithmID;
+import org.cose.java.CoseException;
+import org.cose.java.OneKey;
 import com.upokecenter.cbor.CBORObject;
 import ee.ria.eudi.qeaa.rp.controller.CredentialNamespace;
 import ee.ria.eudi.qeaa.rp.error.ServiceException;
